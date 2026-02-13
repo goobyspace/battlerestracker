@@ -16,8 +16,9 @@ end
 function core.Utils:MapUnique(arr, func)
     local newArray = {}
     local newIndex = 1
-    for oldIndex, v in ipairs(arr) do
-        local newValue = func(v, oldIndex)
+    -- pairs instead of ipairs for dictionary support
+    for key, value in pairs(arr) do
+        local newValue = func(key, value)
         local newValueFound = false;
         for i = 0, # newArray do
             if newArray[i] == newValue then
@@ -30,4 +31,12 @@ function core.Utils:MapUnique(arr, func)
         end
     end
     return newArray
+end
+
+function core.Utils:DefaultsTableChecker(current, defaults)
+    for key, value in pairs(defaults) do
+        if current[key] == nil then
+            current[key] = value;
+        end
+    end
 end

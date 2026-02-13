@@ -1,0 +1,22 @@
+## Interface: 120001
+## Title: Battle Res Tracker
+## Notes: Tracks battle res charges and cooldown in M+ and raid
+## Version: @project-version@
+## DefaultState: enabled
+## SavedVariables: BattleResTrackerVariables
+## Author: gooby.space
+## X-Curse-Project-ID: -
+## X-Wago-ID: -
+## Category: Combat
+
+
+Libs\LibStub\LibStub.lua
+libs\LibEditMode\namespaced.lua
+libs\LibEditMode\embed.xml
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibSharedMedia-3.0\lib.xml
+
+Utils.lua
+EditMode.lua
+Logic.lua
+Init.lua
