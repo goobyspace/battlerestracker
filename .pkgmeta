@@ -1,4 +1,4 @@
-package-as: GoobyFrameTweaks
+package-as: BattleResTracker
 enable-nolib-creation: no
 
 ignore:
@@ -12,9 +12,3 @@ externals:
     libs/LibEditMode:
       url: https://github.com/p3lim-wow/LibEditMode
       tag: latest
-
-move-folders:
-  ShortWave/ShortWave: ShortWave
-  ShortWave/ShortWave_MusicData: ShortWave_MusicData
-  ShortWave/ShortWave_AmbienceData: ShortWave_AmbienceData
-  ShortWave/ShortWave_SFXData: ShortWave_SFXData
