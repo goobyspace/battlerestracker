@@ -190,9 +190,35 @@ function core:InitFrame()
         core.editModeActive = false
         core.Logic:ZoneCheck()
     end)
+
+    LibEditMode:RegisterCallback('rename', function(oldLayoutName, newLayoutName, _)
+        if BattleResTrackerVariables['BRFrameSettings'][oldLayoutName] then
+            BattleResTrackerVariables['BRFrameSettings'][newLayoutName] = BattleResTrackerVariables['BRFrameSettings']
+                [oldLayoutName]
+        else
+            BattleResTrackerVariables['BRFrameSettings'][newLayoutName] = CopyTable(defaultValues)
+        end
+    end)
+
+    LibEditMode:RegisterCallback('create', function(layoutName, index, sourceLayoutName)
+        if not sourceLayoutName then
+            if BattleResTrackerVariables['BRFrameSettings'][layoutName] then
+                return
+            else
+                BattleResTrackerVariables['BRFrameSettings'][layoutName] = CopyTable(defaultValues)
+            end
+        elseif BattleResTrackerVariables['BRFrameSettings'][sourceLayoutName] then
+            BattleResTrackerVariables['BRFrameSettings'][layoutName] = BattleResTrackerVariables['BRFrameSettings']
+                [sourceLayoutName]
+        else
+            BattleResTrackerVariables['BRFrameSettings'][layoutName] = CopyTable(defaultValues)
+        end
+    end)
+
     LibEditMode:RegisterCallback('delete', function(layoutName)
         BattleResTrackerVariables['BRFrameSettings'][layoutName] = nil
     end)
+
     LibEditMode:RegisterCallback('layout', function(layoutName)
         -- this will be called every time the Edit Mode layout is changed (which also happens at login),
         -- use it to load the saved button position from savedvariables and position it
@@ -231,7 +257,9 @@ function core:InitFrame()
             BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFontSize,
             BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownOutlined)
 
-        core.Logic:Hide()
+        if not core.editModeActive then
+            core.Logic:Hide()
+        end
     end)
 
     LibEditMode:AddFrame(core.frame, onPositionChanged, defaultValues)
