@@ -3,12 +3,14 @@
 ## Notes: Tracks battle res charges and cooldown in M+ and raid
 ## Version: @project-version@
 ## DefaultState: enabled
-## SavedVariables: BattleResTrackerVariables
 ## Author: gooby.space
-## X-Curse-Project-ID: -
-## X-Wago-ID: -
-## Category: Combat
+## SavedVariables: BattleResTrackerVariables
 
+## Category: Combat
+## IconTexture: Interface\Icons\Spell_Nature_Reincarnation
+
+## X-Curse-Project-ID: 1461842
+## X-Wago-ID: j6jma1NR
 
 Libs\LibStub\LibStub.lua
 libs\LibEditMode\namespaced.lua

@@ -42,6 +42,7 @@ function core.Logic:ZoneCheck()
     if instanceType == 'raid' then
         inRaid = true
         core.Logic:Show()
+        return
     else
         inRaid = false
     end
@@ -49,12 +50,14 @@ function core.Logic:ZoneCheck()
     if C_ChallengeMode.IsChallengeModeActive() then
         inMythicPlus = true
         core.Logic:Show()
+        return
     else
         inMythicPlus = false
     end
 
     if not inMythicPlus and not inRaid then
         core.Logic:Hide()
+        return
     end
 end
 
@@ -77,37 +80,49 @@ function core.Logic:UpdateCharges()
     local cooldownStartTime = nil
     local cooldownDuration = nil
     local chargeModRate = nil
+    local maxCharges = nil
 
     if core.editModeActive then
         currentCharges = 1
         cooldownStartTime = GetTime()
-        cooldownDuration = 60
+        cooldownDuration = 360
         chargeModRate = 1
+        maxCharges = 2
     elseif chargeInfo then
         currentCharges = chargeInfo.currentCharges
         cooldownStartTime = chargeInfo.cooldownStartTime
         cooldownDuration = chargeInfo.cooldownDuration
         chargeModRate = chargeInfo.chargeModRate
+        maxCharges = chargeInfo.maxCharges
     end
 
     if chargeInfo or core.editModeActive then
         core:SetChargesText(currentCharges)
         local timeLeft = cooldownDuration - (GetTime() - cooldownStartTime)
-        core:SetCooldownText(timeLeft > 0 and floor(timeLeft) or '')
+        core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
         core:SetCooldown(cooldownStartTime, cooldownDuration)
 
-        if timeLeft < 0 then
+        if timeLeft < 0 or currentCharges == maxCharges then
             if timer and not timer:IsCancelled() then timer:Cancel() end
             return
         end
 
 
-        if (timer == nil or timer:IsCancelled()) and not core.editModeActive then
+        if (timer == nil or timer:IsCancelled()) then
             timer = C_Timer.NewTicker(chargeModRate, function()
                 chargeInfo = C_Spell.GetSpellCharges(61999)
+                if core.editModeActive then
+                    chargeInfo = {
+                        cooldownDuration = cooldownDuration,
+                        cooldownStartTime = cooldownStartTime,
+                        chargeModRate = 1,
+                        currentCharges = 2,
+                        maxCharges = 6,
+                    }
+                end
                 timeLeft = not chargeInfo and 0 or
                     chargeInfo.cooldownDuration - (GetTime() - chargeInfo.cooldownStartTime)
-                core:SetCooldownText(timeLeft > 0 and floor(timeLeft) or '')
+                core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
                 if timeLeft < 0 and timer then
                     timer:Cancel()
                 end

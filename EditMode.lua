@@ -51,14 +51,14 @@ local defaultValues = {
     chargesEnabled = true,
     chargesFont = fontsDropdownValues[2].value,
     chargesFontSize = 16,
-    chargesOutlined = textOutlinedDropdownValues[3].value,
+    chargesOutlined = textOutlinedDropdownValues[2].value,
     chargesX = -22,
     chargesY = 18,
     -- cooldown
     cooldownEnabled = true,
     cooldownFont = fontsDropdownValues[2].value,
     cooldownFontSize = 16,
-    cooldownOutlined = textOutlinedDropdownValues[3].value,
+    cooldownOutlined = textOutlinedDropdownValues[2].value,
     cooldownX = 0,
     cooldownY = -16,
     --icon
