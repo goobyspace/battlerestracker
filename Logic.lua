@@ -119,10 +119,17 @@ function core.Logic:UpdateCharges()
                         currentCharges = 2,
                         maxCharges = 6,
                     }
+                else
+                    currentCharges = chargeInfo.currentCharges
+                    cooldownStartTime = chargeInfo.cooldownStartTime
+                    cooldownDuration = chargeInfo.cooldownDuration
+                    chargeModRate = chargeInfo.chargeModRate
+                    maxCharges = chargeInfo.maxCharges
                 end
                 timeLeft = not chargeInfo and 0 or
                     chargeInfo.cooldownDuration - (GetTime() - chargeInfo.cooldownStartTime)
                 core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
+                core:SetChargesText(currentCharges)
                 if timeLeft < 0 and timer then
                     timer:Cancel()
                 end
