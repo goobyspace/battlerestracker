@@ -1,4 +1,4 @@
-## Interface: 120007
+## Interface: 120100
 ## Title: Battle Res Tracker
 ## Notes: Tracks battle res charges and cooldown in M+ and raid
 ## Version: @project-version@
