@@ -82,6 +82,8 @@ function core.Logic:UpdateCharges()
     local chargeModRate = nil
     local maxCharges = nil
 
+    if not chargeInfo and not core.editModeActive then return end;
+
     if core.editModeActive then
         currentCharges = 1
         cooldownStartTime = GetTime()
@@ -96,44 +98,43 @@ function core.Logic:UpdateCharges()
         maxCharges = chargeInfo.maxCharges
     end
 
-    if chargeInfo or core.editModeActive then
-        core:SetChargesText(currentCharges)
-        local timeLeft = cooldownDuration - (GetTime() - cooldownStartTime)
-        core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
-        core:SetCooldown(cooldownStartTime, cooldownDuration)
 
-        if timeLeft < 0 or currentCharges == maxCharges then
-            if timer and not timer:IsCancelled() then timer:Cancel() end
-            return
-        end
+    core:SetChargesText(currentCharges)
+    local timeLeft = cooldownDuration - (GetTime() - cooldownStartTime)
+    core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
+    core:SetCooldown(cooldownStartTime, cooldownDuration)
+
+    if timeLeft < 0 or currentCharges == maxCharges then
+        if timer and not timer:IsCancelled() then timer:Cancel() end
+        return
+    end
 
 
-        if (timer == nil or timer:IsCancelled()) then
-            timer = C_Timer.NewTicker(chargeModRate, function()
-                chargeInfo = C_Spell.GetSpellCharges(61999)
-                if core.editModeActive then
-                    chargeInfo = {
-                        cooldownDuration = cooldownDuration,
-                        cooldownStartTime = cooldownStartTime,
-                        chargeModRate = 1,
-                        currentCharges = 2,
-                        maxCharges = 6,
-                    }
-                else
-                    currentCharges = chargeInfo.currentCharges
-                    cooldownStartTime = chargeInfo.cooldownStartTime
-                    cooldownDuration = chargeInfo.cooldownDuration
-                    chargeModRate = chargeInfo.chargeModRate
-                    maxCharges = chargeInfo.maxCharges
-                end
-                timeLeft = not chargeInfo and 0 or
-                    chargeInfo.cooldownDuration - (GetTime() - chargeInfo.cooldownStartTime)
-                core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
-                core:SetChargesText(currentCharges)
-                if timeLeft < 0 and timer then
-                    timer:Cancel()
-                end
-            end)
-        end
+    if (timer == nil or timer:IsCancelled()) then
+        timer = C_Timer.NewTicker(chargeModRate, function()
+            chargeInfo = C_Spell.GetSpellCharges(61999)
+            if core.editModeActive then
+                chargeInfo = {
+                    cooldownDuration = cooldownDuration,
+                    cooldownStartTime = cooldownStartTime,
+                    chargeModRate = 1,
+                    currentCharges = 2,
+                    maxCharges = 6,
+                }
+            elseif chargeInfo then
+                currentCharges = chargeInfo.currentCharges
+                cooldownStartTime = chargeInfo.cooldownStartTime
+                cooldownDuration = chargeInfo.cooldownDuration
+                chargeModRate = chargeInfo.chargeModRate
+                maxCharges = chargeInfo.maxCharges
+            end
+            timeLeft = not chargeInfo and 0 or
+                chargeInfo.cooldownDuration - (GetTime() - chargeInfo.cooldownStartTime)
+            core:SetCooldownText(timeLeft > 0 and core.Utils:FormatTime(floor(timeLeft)) or '')
+            core:SetChargesText(currentCharges)
+            if timeLeft < 0 and timer then
+                timer:Cancel()
+            end
+        end)
     end
 end
