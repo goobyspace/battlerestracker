@@ -68,9 +68,16 @@ local defaultValues = {
     height = 48,
 }
 
+-- falls back to defaults when layoutName/settings aren't available yet
+local function getFrameSettings(layoutName)
+    return (layoutName and BattleResTrackerVariables['BRFrameSettings'][layoutName]) or defaultValues
+end
+
 function core:SetChargesText(text)
     local layoutName = LibEditMode:GetActiveLayoutName()
-    if (BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesEnabled) then
+    local settings = layoutName and BattleResTrackerVariables['BRFrameSettings'][layoutName]
+    if not settings then return end
+    if (settings.chargesEnabled) then
         core.frame.charges:SetText(text)
     else
         core.frame.charges:SetText("")
@@ -79,7 +86,9 @@ end
 
 function core:SetCooldownText(text)
     local layoutName = LibEditMode:GetActiveLayoutName()
-    if (BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownEnabled) then
+    local settings = layoutName and BattleResTrackerVariables['BRFrameSettings'][layoutName]
+    if not settings then return end
+    if (settings.cooldownEnabled) then
         core.frame.cooldownText:SetText(text)
     else
         core.frame.cooldownText:SetText("")
@@ -88,7 +97,9 @@ end
 
 function core:SetCooldown(cooldownStartTime, cooldownDuration)
     local layoutName = LibEditMode:GetActiveLayoutName()
-    if (BattleResTrackerVariables['BRFrameSettings'][layoutName].iconEnabled) then
+    local settings = layoutName and BattleResTrackerVariables['BRFrameSettings'][layoutName]
+    if not settings then return end
+    if (settings.iconEnabled) then
         core.frame.cooldown:SetCooldown(cooldownStartTime, cooldownDuration)
     else
         core.frame.cooldown:Clear()
@@ -119,6 +130,7 @@ function core:InitFrame()
 
     -- this just updates the main position
     local function onPositionChanged(frame, layoutName, point, x, y)
+        if not layoutName then return end
         BattleResTrackerVariables['BRFrameSettings'][layoutName].point = point
         BattleResTrackerVariables['BRFrameSettings'][layoutName].x = x
         BattleResTrackerVariables['BRFrameSettings'][layoutName].y = y
@@ -222,6 +234,8 @@ function core:InitFrame()
     LibEditMode:RegisterCallback('layout', function(layoutName)
         -- this will be called every time the Edit Mode layout is changed (which also happens at login),
         -- use it to load the saved button position from savedvariables and position it
+        if not layoutName then return end
+
         if not BattleResTrackerVariables['BRFrameSettings'] then
             BattleResTrackerVariables['BRFrameSettings'] = {}
         end
@@ -274,11 +288,11 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Checkbox,
             default = defaultValues.chargesEnabled,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesEnabled
+                return getFrameSettings(layoutName).chargesEnabled
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesEnabled = value
-                -- setChargesSettings(value)
                 core.frame.charges:SetShown(value)
             end,
         },
@@ -287,9 +301,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.chargesX,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesX
+                return getFrameSettings(layoutName).chargesX
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesX = value
                 core.frame.charges:SetPoint('CENTER', value, BattleResTrackerVariables['BRFrameSettings'][layoutName]
                     .chargesY)
@@ -303,9 +318,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.chargesY,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesY
+                return getFrameSettings(layoutName).chargesY
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesY = value
                 core.frame.charges:SetPoint('CENTER', BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesX,
                     value)
@@ -319,9 +335,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Dropdown,
             default = defaultValues.chargesFont,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFont
+                return getFrameSettings(layoutName).chargesFont
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFont = value
                 core.frame.charges:SetFont(value,
                     BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFontSize,
@@ -334,9 +351,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.chargesFontSize,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFontSize
+                return getFrameSettings(layoutName).chargesFontSize
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFontSize = value
                 core.frame.charges:SetFont(BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFont,
                     value,
@@ -351,9 +369,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Dropdown,
             default = defaultValues.chargesOutlined,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesOutlined
+                return getFrameSettings(layoutName).chargesOutlined
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesOutlined = value
                 core.frame.charges:SetFont(BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFont,
                     BattleResTrackerVariables['BRFrameSettings'][layoutName].chargesFontSize,
@@ -370,11 +389,11 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Checkbox,
             default = defaultValues.cooldownEnabled,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownEnabled
+                return getFrameSettings(layoutName).cooldownEnabled
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownEnabled = value
-                -- setCooldownSettings(value)
                 core.frame.cooldownText:SetShown(value)
             end,
         },
@@ -383,9 +402,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.cooldownX,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownX
+                return getFrameSettings(layoutName).cooldownX
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownX = value
                 core.frame.cooldownText:SetPoint('CENTER', value,
                     BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownY)
@@ -399,9 +419,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.cooldownY,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownY
+                return getFrameSettings(layoutName).cooldownY
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownY = value
                 core.frame.cooldownText:SetPoint('CENTER', BattleResTrackerVariables['BRFrameSettings'][layoutName]
                     .cooldownX,
@@ -416,9 +437,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Dropdown,
             default = defaultValues.cooldownFont,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFont
+                return getFrameSettings(layoutName).cooldownFont
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFont = value
                 core.frame.cooldownText:SetFont(value,
                     BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFontSize,
@@ -431,9 +453,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.cooldownFontSize,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFontSize
+                return getFrameSettings(layoutName).cooldownFontSize
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFontSize = value
                 core.frame.cooldownText:SetFont(BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFont,
                     value,
@@ -448,9 +471,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Dropdown,
             default = defaultValues.cooldownOutlined,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownOutlined
+                return getFrameSettings(layoutName).cooldownOutlined
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownOutlined = value
                 core.frame.cooldownText:SetFont(BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFont,
                     BattleResTrackerVariables['BRFrameSettings'][layoutName].cooldownFontSize,
@@ -467,12 +491,12 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Checkbox,
             default = defaultValues.iconEnabled,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].iconEnabled
+                return getFrameSettings(layoutName).iconEnabled
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].iconEnabled = value
                 core.frame.cooldown:SetShown(value)
-                -- setIconSettings(value)
                 core.frame.icon:SetShown(value)
             end,
         },
@@ -481,9 +505,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Dropdown,
             default = defaultValues.icon,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].icon
+                return getFrameSettings(layoutName).icon
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].icon = value
                 core.frame.icon:SetTexture(value)
             end,
@@ -494,9 +519,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.width,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].width
+                return getFrameSettings(layoutName).width
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].width = value
                 core.frame:SetSize(value, BattleResTrackerVariables['BRFrameSettings'][layoutName].height)
             end,
@@ -509,9 +535,10 @@ function core:InitFrame()
             kind = LibEditMode.SettingType.Slider,
             default = defaultValues.height,
             get = function(layoutName)
-                return BattleResTrackerVariables['BRFrameSettings'][layoutName].height
+                return getFrameSettings(layoutName).height
             end,
             set = function(layoutName, value)
+                if not layoutName then return end
                 BattleResTrackerVariables['BRFrameSettings'][layoutName].height = value
                 core.frame:SetSize(BattleResTrackerVariables['BRFrameSettings'][layoutName].width, value)
             end,

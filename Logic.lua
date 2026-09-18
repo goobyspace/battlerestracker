@@ -27,10 +27,10 @@ function core.Logic:Init()
             end
         elseif event == 'ZONE_CHANGED_NEW_AREA' or event == 'CHALLENGE_MODE_START' or event == 'PLAYER_ENTERING_WORLD' then
             core.Logic:ZoneCheck()
-        elseif inRaid and event == 'PLAYER_REGEN_ENABLED' then
+        elseif inRaid and event == 'PLAYER_REGEN_DISABLED' then
             inRaidCombat = true
             core.Logic:UpdateCharges()
-        elseif event == 'PLAYER_REGEN_DISABLED' then
+        elseif event == 'PLAYER_REGEN_ENABLED' then
             inRaidCombat = false
             core.Logic:UpdateCharges()
         end
